@@ -201,7 +201,34 @@ class MaNish(object):
             return '{"error":"' + str(e)  + '"}'
 
 
+    def send_contacts(self, contacts: List[Dict[Any, Any]], recipient_id: str):
+        """send_contacts
+        Send a list of contacts to a user
+        Args:
+            contacts(List[Dict[Any, Any]]): List of contacts to send
+            recipient_id(str): Phone number of the user with country code wihout +
+        Example:
+            >>> from whatsapp import WhatsApp
+            >>> whatsapp = WhatsApp(token, phone_number_id)
+            >>> contacts = Contacts Object
+        REFERENCE: https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages#contacts-object
+        """
 
+        data = {
+            "messaging_product": "whatsapp",
+            "to": recipient_id,
+            "type": "contacts",
+            "contacts": contacts,
+        }
+        logger.info(f"Sending contacts to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Contacts sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Contacts not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.error(f"Response: {r.json()}")
+        return r.json()
 
 
 

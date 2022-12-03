@@ -1,7 +1,33 @@
 import json
+from json import JSONEncoder
+from enum import Enum
+
+class Contact(object):
+    """
+    Whatsapp Contact object
+    Args:
+        >>> name: Name object (formatted_name, First, Last, etc.)
+        >>> addresses: List of addresses
+        >>> emails: List of email addresses
+        >>> phones: List of email addresses
+    """
+    def __init__(self, name, addresses: list = [], emails: list = [], phones: list = []):
+        self.name = name
+        self.addresses = addresses
+        self.emails = emails
+        self.phones = phones
 
 
-class address(object):
+class ContactEncoder(JSONEncoder):
+    """
+    Methon to json encode
+    """
+    def default(self, o):
+        return o.__dict__
+
+
+
+class Address(object):
     street: str
     cist: str
     state: str
@@ -20,7 +46,7 @@ class address(object):
         self.type = type
 
 
-class email(object):
+class Email(object):
     email: str
     type: str
 
@@ -29,23 +55,23 @@ class email(object):
         self.type = type
 
 
-class name(object):
-    formated_name: str
+class Name(object):
+    formatted_name: str
     first_name: str
     last_name: str
     middle_name: str
     suffix: str
     prefix: str
 
-    def __init__(self, formated_name: str, first_name: str = "", last_name: str = "", middle_name: str = "",suffix: str = "", prefix: str = ""):
-        self.formated_name = formated_name
+    def __init__(self, formatted_name: str, first_name: str = "", last_name: str = "", middle_name: str = "",suffix: str = "", prefix: str = ""):
+        self.formatted_name = formatted_name
         self.first_name = first_name
         self.last_name = last_name
         self.middle_name = middle_name
         self.suffix = suffix
         self.prefix = prefix
 
-class phone(object):
+class Phone(object):
     phone: str
     type: str
     wa_id: str
@@ -56,7 +82,7 @@ class phone(object):
         self.wa_id = wa_id
 
 
-class url(object):
+class Url(object):
     url: str
     type: str
 
