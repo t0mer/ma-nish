@@ -8,6 +8,7 @@ import mimetypes
 import validators
 from loguru import logger
 from .helpers import Helpers
+from .location import *
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from typing import Optional, Dict, Any, List, Union, Tuple, Callable
 
@@ -230,6 +231,45 @@ class MaNish(object):
         logger.error(f"Response: {r.json()}")
         return r.json()
 
+
+
+
+
+
+    def send_location(self, location: Location, recipient_id):
+        """
+        Sends a location message to a WhatsApp user
+        Args:
+            lat[str]: Latitude of the location
+            long[str]: Longitude of the location
+            name[str]: Name of the location
+            address[str]: Address of the location
+            recipient_id[str]: Phone number of the user with country code wihout +
+        Example:
+            >>> from whatsapp import WhatsApp
+            >>> whatsapp = WhatsApp(token, phone_number_id)
+            >>> whatsapp.send_location("-23.564", "-46.654", "My Location", "Rua dois, 123", "5511999999999")
+        """
+        data = {
+            "messaging_product": "whatsapp",
+            "to": recipient_id,
+            "type": "location",
+            "location": {
+                "latitude": location.latitude,
+                "longitude": location.longitude,
+                "name": location.name,
+                "address": location.address,
+            },
+        }
+        logger.info(f"Sending location to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Location sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Location not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.error(r.json())
+        return r.json()
 
 
 

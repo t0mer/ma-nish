@@ -19,7 +19,8 @@ install_requires = [
     'python-dotenv',
     'requests',
     'requests-toolbelt',
-    'validators'
+    'validators',
+    'geopy'
     
 ]
 
