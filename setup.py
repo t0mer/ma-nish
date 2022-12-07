@@ -20,7 +20,8 @@ install_requires = [
     'requests',
     'requests-toolbelt',
     'validators',
-    'geopy'
+    'geopy',
+    'Pillow'
     
 ]
 

@@ -4,17 +4,20 @@ from geopy.geocoders import Nominatim
 class Location(object):
     name: str
     address: str
+    latitude: str
+    longitude: str
 
-    def __init__(self, name: str ="", address: str = ""):
+    def __init__(self, name: str ="", address: str="", latitude: str="", longitude: str=""):
         self.latitude = None
         self.longitude = None
         self.name = name
         self.address = address
 
-        geolocator = Nominatim(user_agent = "MaNish")
-        location = geolocator.geocode("הגליל 48 רעננה")
-        self.latitude = location.latitude
-        self.longitude = location.longitude
+        if self.latitude == "" or self.longitude == "":
+            geolocator = Nominatim(user_agent = "MaNish")
+            location = geolocator.geocode(address)
+            self.latitude = location.latitude
+            self.longitude = location.longitude
 
 
 

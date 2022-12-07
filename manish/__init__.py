@@ -201,6 +201,101 @@ class MaNish(object):
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
 
+    def send_image(self, image, recipient_id, recipient_type="individual", caption=None):
+        """
+        Sends an image message to a WhatsApp user
+        There are two ways to send an image message to a user, either by passing the image id or by passing the image link.
+        Image id is the id of the image uploaded to the cloud api.
+        Args:
+            image[str]: Image id or link of the image
+            recipient_id[str]: Phone number of the user with country code wihout +
+            recipient_type[str]: Type of the recipient, either individual or group
+            caption[str]: Caption of the image
+            link[bool]: Whether to send an image id or an image link, True means that the image is an id, False means that the image is a link
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
+        """
+        if validators.url(image):
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": recipient_type,
+                "to": recipient_id,
+                "type": "image",
+                "image": {"link": image, "caption": caption},
+            }
+        else:
+            if os.path.exists(image):
+                id = self.upload_media(image)
+            else:
+                id = image
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": recipient_type,
+                "to": recipient_id,
+                "type": "image",
+                "image": {"id": id, "caption": caption},
+            }
+        logger.info(f"Sending image to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Image sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Image not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.error(r.json())
+        return r.json()
+
+    def send_sticker(self, sticker, recipient_id, recipient_type="individual", caption=None):
+        """
+        Sends an image message to a WhatsApp user
+        There are two ways to send an image message to a user, either by passing the image id or by passing the image link.
+        Image id is the id of the image uploaded to the cloud api.
+        Args:
+            image[str]: Image id or link of the image
+            recipient_id[str]: Phone number of the user with country code wihout +
+            recipient_type[str]: Type of the recipient, either individual or group
+            caption[str]: Caption of the image
+            link[bool]: Whether to send an image id or an image link, True means that the image is an id, False means that the image is a link
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
+        """
+        if validators.url(sticker):
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": recipient_type,
+                "to": recipient_id,
+                "type": "image",
+                "image": {"link": sticker, "caption": caption},
+            }
+        else:
+            if os.path.exists(sticker):
+                sticker = Helpers().convert_to_webp(sticker)
+                id = self.upload_media(sticker)
+            else:
+                id = sticker
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": recipient_type,
+                "to": recipient_id,
+                "type": "sticker",
+                "sticker": {"id": id},
+            }
+        logger.info(f"Sending image to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Image sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Image not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.error(r.json())
+        return r.json()
+
+
+
 
     def send_contacts(self, contacts: List[Dict[Any, Any]], recipient_id: str):
         """send_contacts
@@ -209,8 +304,8 @@ class MaNish(object):
             contacts(List[Dict[Any, Any]]): List of contacts to send
             recipient_id(str): Phone number of the user with country code wihout +
         Example:
-            >>> from whatsapp import WhatsApp
-            >>> whatsapp = WhatsApp(token, phone_number_id)
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
             >>> contacts = Contacts Object
         REFERENCE: https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages#contacts-object
         """
@@ -246,9 +341,9 @@ class MaNish(object):
             address[str]: Address of the location
             recipient_id[str]: Phone number of the user with country code wihout +
         Example:
-            >>> from whatsapp import WhatsApp
-            >>> whatsapp = WhatsApp(token, phone_number_id)
-            >>> whatsapp.send_location("-23.564", "-46.654", "My Location", "Rua dois, 123", "5511999999999")
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.send_location("-23.564", "-46.654", "My Location", "Rua dois, 123", "5511999999999")
         """
         data = {
             "messaging_product": "whatsapp",

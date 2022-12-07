@@ -4,8 +4,8 @@ import time
 import requests
 from os import path
 from urllib.parse import urlparse
-
-
+from PIL import Image
+from loguru import logger
 class Helpers:
     def __init__(self):
         self.temp_directory = os.getcwd() + "/temp"
@@ -22,3 +22,19 @@ class Helpers:
         return self.temp_directory +"/" +  os.path.basename(urlparse(url).path)   
 
 
+    def convert_to_webp(self,source):
+        logger.info(source)
+        """Convert image to WebP.
+
+        Args:
+            source (pathlib.Path): Path to source image
+
+        Returns:
+            pathlib.Path: path to new image
+        """
+        destination = str(os.path.splitext(source)) +".webp"
+
+        image = Image.open(source)  # Open image
+        image.save(destination, format="webp")  # Convert image to webp
+
+        return destination
