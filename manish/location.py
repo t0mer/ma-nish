@@ -19,8 +19,6 @@ class Location(object):
             self.latitude = location.latitude
             self.longitude = location.longitude
 
-
-
 class LocationEncoder(JSONEncoder):
     """
     Methon to json encode

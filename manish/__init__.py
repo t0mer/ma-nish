@@ -32,7 +32,6 @@ class MaNish(object):
             "Authorization": "Bearer {}".format(self.token),
         }
 
-
     def send_message(self, message, recipient_id, recipient_type="individual", preview_url=True):
         """
          Sends a text message to a WhatsApp user
@@ -68,7 +67,6 @@ class MaNish(object):
         except Exception as e:
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
-
 
     def send_video(self, video, recipient_id, caption=None):
         """ "
@@ -112,7 +110,6 @@ class MaNish(object):
         logger.error(f"Response: {r.json()}")
         return r.json()
 
-
     def send_document(self, document, recipient_id, caption=None):
         """ "
         Sends a document message to a WhatsApp user
@@ -154,7 +151,6 @@ class MaNish(object):
         logger.info(f"Status code: {r.status_code}")
         logger.error(f"Response: {r.json()}")
         return r.json()
-
 
     def send_audio(self, audio, recipient_id):
         """
@@ -294,9 +290,6 @@ class MaNish(object):
         logger.error(r.json())
         return r.json()
 
-
-
-
     def send_contacts(self, contacts: List[Dict[Any, Any]], recipient_id: str):
         """send_contacts
         Send a list of contacts to a user
@@ -325,11 +318,6 @@ class MaNish(object):
         logger.info(f"Status code: {r.status_code}")
         logger.error(f"Response: {r.json()}")
         return r.json()
-
-
-
-
-
 
     def send_location(self, location: Location, recipient_id):
         """
@@ -366,7 +354,52 @@ class MaNish(object):
         logger.error(r.json())
         return r.json()
 
+    def reply_to_message(self, message_id: str, recipient_id: str, message: str, preview_url: bool = True):
+        """
+        Replies to a message
+        Args:
+            message_id[str]: Message id of the message to be replied to
+            recipient_id[str]: Phone number of the user with country code wihout +
+            message[str]: Message to be sent to the user
+            preview_url[bool]: Whether to send a preview url or not
+        """
+        data = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_id,
+            "type": "text",
+            "context": {"message_id": message_id},
+            "text": {"preview_url": preview_url, "body": message},
+        }
 
+        logger.info(f"Replying to {message_id}")
+        r = requests.post(f"{self.url}", headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Message sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Message not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.info(f"Response: {r.json()}")
+        return r.json()
+
+
+
+
+    def delete_media(self, media_id: str):
+        """
+        Deletes a media from the cloud api
+        Args:
+            media_id[str]: Id of the media to be deleted
+        """
+        logger.info(f"Deleting media {media_id}")
+        r = requests.delete(f"{self.base_url}/{media_id}", headers=self.headers)
+        if r.status_code == 200:
+            logger.info(f"Media {media_id} deleted")
+            return r.json()
+        logger.info(f"Error deleting media {media_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.info(f"Response: {r.json()}")
+        return None
 
     def upload_media(self, media: str):
         """
