@@ -9,6 +9,7 @@ import validators
 from loguru import logger
 from .helpers import Helpers
 from .location import *
+from .button import *
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from typing import Optional, Dict, Any, List, Union, Tuple, Callable
 
@@ -383,6 +384,32 @@ class MaNish(object):
         return r.json()
 
 
+    def send_button(self, button, recipient_id):
+        """
+        Sends an interactive buttons message to a WhatsApp user
+        Args:
+            button[dict]: A dictionary containing the button data(rows-title may not exceed 20 characters)
+            recipient_id[str]: Phone number of the user with country code wihout +
+        check https://github.com/Neurotech-HQ/heyoo#sending-interactive-reply-buttons for an example.
+        """
+        button = json.loads(button)
+        data = {
+            "messaging_product": "whatsapp",
+            "to": recipient_id,
+            "type": "interactive",
+            "interactive": self.create_button(button),
+        }
+        logger.info(f"Sending buttons to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Buttons sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Buttons not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.info(f"Response: {r.json()}")
+        return r.json()
+
+
 
 
     def delete_media(self, media_id: str):
@@ -444,3 +471,22 @@ class MaNish(object):
         except Exception as e:
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
+
+    def create_button(self, button):
+        """
+        Method to create a button object to be used in the send_message method.
+        This is method is designed to only be used internally by the send_button method.
+        Args:
+               button[dict]: A dictionary containing the button data
+        """
+        data = {
+            "type": "list",
+            "action": button.get("action")
+        }
+        if button.get("header"):
+            data["header"] = {"type": "text", "text": button.get("header")}
+        if button.get("body"):
+            data["body"] = {"text": button.get("body")}
+        if button.get("footer"):
+            data["footer"] = {"text": button.get("footer")}
+        return data
