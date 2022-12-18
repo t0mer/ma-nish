@@ -7,13 +7,13 @@ class Location(object):
     latitude: str
     longitude: str
 
-    def __init__(self, name: str ="", address: str="", latitude: str="", longitude: str=""):
+    def __init__(self, name: str =None, address: str=None, latitude: str="", longitude: str=""):
         self.latitude = None
         self.longitude = None
         self.name = name
         self.address = address
 
-        if self.latitude == "" or self.longitude == "":
+        if self.latitude is None or self.longitude is None:
             geolocator = Nominatim(user_agent = "MaNish")
             location = geolocator.geocode(address)
             self.latitude = location.latitude
