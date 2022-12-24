@@ -1,0 +1,4 @@
+-r requirements.in
+pylint
+mypy
+black

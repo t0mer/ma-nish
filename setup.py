@@ -15,15 +15,9 @@ setup_args = dict(
     download_url='https://pypi.org/project/ma-nish/'
 )
 
-install_requires = [
-    'python-dotenv',
-    'requests',
-    'requests-toolbelt',
-    'validators',
-    'geopy',
-    'Pillow'
-    
-]
+with open('requirements.in', 'r', encoding='utf-8') as file:
+
+    install_requires = file.readlines()
 
 if __name__ == '__main__':
     setup(**setup_args, install_requires=install_requires)
