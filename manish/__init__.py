@@ -16,22 +16,26 @@ from typing import Optional, Dict, Any, List, Union, Tuple, Callable
 
 class MaNish(object):
 
-    def __init__(self,token:str=None,phone_number_id:str=None):
-        """
-        Init the MaNish (Whatsapp) object.
 
-        Args:
-            token[str]: Token for the Whatsapp cloud API (Make sure to generate permanent one)
-            phone_number_id[str]: Phone number id for the WhatsApp cloud API.
-        """
-        self.phone_number_id = phone_number_id
-        self.base_url = "https://graph.facebook.com/v15.0"
-        self.url = f"{self.base_url}/{phone_number_id}/messages"
-        self.token = token
-        self.headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer {}".format(self.token),
-        }
+    def __init__(self,token:str=None,phone_number_id:str=None):
+        try:
+            """
+            Init the MaNish (Whatsapp) object.
+
+            Args:
+                token[str]: Token for the Whatsapp cloud API (Make sure to generate permanent one)
+                phone_number_id[str]: Phone number id for the WhatsApp cloud API.
+            """
+            self.phone_number_id = phone_number_id
+            self.base_url = "https://graph.facebook.com/v15.0"
+            self.url = f"{self.base_url}/{phone_number_id}/messages"
+            self.token = token
+            self.headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {}".format(self.token),
+            }
+        except Exception as e:
+            logger.error("Error initializing MaNish: " + str(e))
 
     def send_message(self, message, recipient_id, recipient_type="individual", preview_url=True):
         """
@@ -83,33 +87,37 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.send_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "1122334455667")
         """
-        if validators.url(video):
-            data = {
-                "messaging_product": "whatsapp",
-                "to": recipient_id,
-                "type": "video",
-                "video": {"link": video, "caption": caption},
-            }
-        else:
-            if os.path.exists(video):
-                id = self.upload_media(video)
+        try:
+            if validators.url(video):
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": recipient_id,
+                    "type": "video",
+                    "video": {"link": video, "caption": caption},
+                }
             else:
-                id = video
-            data = {
-                "messaging_product": "whatsapp",
-                "to": recipient_id,
-                "type": "video",
-                "video": {"id": id, "caption": caption},
-            }
-        logger.info(f"Sending video to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Video sent to {recipient_id}")
+                if os.path.exists(video):
+                    id = self.upload_media(video)
+                else:
+                    id = video
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": recipient_id,
+                    "type": "video",
+                    "video": {"id": id, "caption": caption},
+                }
+            logger.info(f"Sending video to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Video sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Video not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Video not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_document(self, document, recipient_id, caption=None):
         """ "
@@ -125,33 +133,37 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.send_document("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", "1122334455667")
         """
-        if validators.url(document):
-            data = {
-                "messaging_product": "whatsapp",
-                "to": recipient_id,
-                "type": "document",
-                "document": {"link": document, "caption": caption},
-            }
-        else:
-            if os.path.exists(document):
-                id = self.upload_media(document)
+        try:
+            if validators.url(document):
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": recipient_id,
+                    "type": "document",
+                    "document": {"link": document, "caption": caption},
+                }
             else:
-                id = document
-            data = {
-                "messaging_product": "whatsapp",
-                "to": recipient_id,
-                "type": "document",
-                "document": {"id": id, "caption": caption},
-            }
-        logger.info(f"Sending document to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Document sent to {recipient_id}")
+                if os.path.exists(document):
+                    id = self.upload_media(document)
+                else:
+                    id = document
+                data = {
+                    "messaging_product": "whatsapp",
+                    "to": recipient_id,
+                    "type": "document",
+                    "document": {"id": id, "caption": caption},
+                }
+            logger.info(f"Sending document to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Document sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Document not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Document not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_audio(self, audio, recipient_id):
         """
@@ -214,36 +226,40 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
         """
-        if validators.url(image):
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": recipient_type,
-                "to": recipient_id,
-                "type": "image",
-                "image": {"link": image, "caption": caption},
-            }
-        else:
-            if os.path.exists(image):
-                id = self.upload_media(image)
-                logger.debug(id)
+        try:
+            if validators.url(image):
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": recipient_type,
+                    "to": recipient_id,
+                    "type": "image",
+                    "image": {"link": image, "caption": caption},
+                }
             else:
-                id = image
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": recipient_type,
-                "to": recipient_id,
-                "type": "image",
-                "image": {"id": id, "caption": caption},
-            }
-        logger.info(f"Sending image to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Image sent to {recipient_id}")
+                if os.path.exists(image):
+                    id = self.upload_media(image)
+                    logger.debug(id)
+                else:
+                    id = image
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": recipient_type,
+                    "to": recipient_id,
+                    "type": "image",
+                    "image": {"id": id, "caption": caption},
+                }
+            logger.info(f"Sending image to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Image sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Image not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(r.json())
             return r.json()
-        logger.info(f"Image not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(r.json())
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_sticker(self, sticker, recipient_id, recipient_type="individual", caption=None):
         """
@@ -261,36 +277,40 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
         """
-        if validators.url(sticker):
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": recipient_type,
-                "to": recipient_id,
-                "type": "image",
-                "image": {"link": sticker, "caption": caption},
-            }
-        else:
-            if os.path.exists(sticker):
-                sticker = Helpers().convert_to_webp(sticker)
-                id = self.upload_media(sticker)
+        try:
+            if validators.url(sticker):
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": recipient_type,
+                    "to": recipient_id,
+                    "type": "image",
+                    "image": {"link": sticker, "caption": caption},
+                }
             else:
-                id = sticker
-            data = {
-                "messaging_product": "whatsapp",
-                "recipient_type": recipient_type,
-                "to": recipient_id,
-                "type": "sticker",
-                "sticker": {"id": id},
-            }
-        logger.info(f"Sending image to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Image sent to {recipient_id}")
+                if os.path.exists(sticker):
+                    sticker = Helpers().convert_to_webp(sticker)
+                    id = self.upload_media(sticker)
+                else:
+                    id = sticker
+                data = {
+                    "messaging_product": "whatsapp",
+                    "recipient_type": recipient_type,
+                    "to": recipient_id,
+                    "type": "sticker",
+                    "sticker": {"id": id},
+                }
+            logger.info(f"Sending image to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Image sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Image not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(r.json())
             return r.json()
-        logger.info(f"Image not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(r.json())
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_contacts(self, contacts: List[Dict[Any, Any]], recipient_id: str):
         """send_contacts
@@ -304,22 +324,25 @@ class MaNish(object):
             >>> contacts = Contacts Object
         REFERENCE: https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages#contacts-object
         """
-
-        data = {
-            "messaging_product": "whatsapp",
-            "to": recipient_id,
-            "type": "contacts",
-            "contacts": contacts,
-        }
-        logger.info(f"Sending contacts to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Contacts sent to {recipient_id}")
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "to": recipient_id,
+                "type": "contacts",
+                "contacts": contacts,
+            }
+            logger.info(f"Sending contacts to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Contacts sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Contacts not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Contacts not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_location(self, location: Location, recipient_id):
         """
@@ -335,26 +358,30 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.send_location("-23.564", "-46.654", "My Location", "Rua dois, 123", "5511999999999")
         """
-        data = {
-            "messaging_product": "whatsapp",
-            "to": recipient_id,
-            "type": "location",
-            "location": {
-                "latitude": location.latitude,
-                "longitude": location.longitude,
-                "name": location.name,
-                "address": location.address,
-            },
-        }
-        logger.info(f"Sending location to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Location sent to {recipient_id}")
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "to": recipient_id,
+                "type": "location",
+                "location": {
+                    "latitude": location.latitude,
+                    "longitude": location.longitude,
+                    "name": location.name,
+                    "address": location.address,
+                },
+            }
+            logger.info(f"Sending location to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Location sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Location not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(r.json())
             return r.json()
-        logger.info(f"Location not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.error(r.json())
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_template(self, template, recipient_id, lang="en_US", components: str={}):
         """
@@ -375,25 +402,29 @@ class MaNish(object):
             >>> namish = MaNish(token, phone_number_id)
             >>> MaNish.send_template("hello_world", "5511999999999", lang="en_US"))
         """
-        data = {
-            "messaging_product": "whatsapp",
-            "to": recipient_id,
-            "type": "template",
-            "template": {
-                "name": template,
-                "language": {"code": lang},
-                "components": components,
-            },
-        }
-        logger.info(f"Sending template to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Template sent to {recipient_id}")
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "to": recipient_id,
+                "type": "template",
+                "template": {
+                    "name": template,
+                    "language": {"code": lang},
+                    "components": components,
+                },
+            }
+            logger.info(f"Sending template to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Template sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Template not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.info(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Template not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.info(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def reply_to_message(self, message_id: str, recipient_id: str, message: str, preview_url: bool = True):
         """
@@ -404,24 +435,28 @@ class MaNish(object):
             message[str]: Message to be sent to the user
             preview_url[bool]: Whether to send a preview url or not
         """
-        data = {
-            "messaging_product": "whatsapp",
-            "recipient_type": "individual",
-            "to": recipient_id,
-            "type": "text",
-            "context": {"message_id": message_id},
-            "text": {"preview_url": preview_url, "body": message},
-        }
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": recipient_id,
+                "type": "text",
+                "context": {"message_id": message_id},
+                "text": {"preview_url": preview_url, "body": message},
+            }
 
-        logger.info(f"Replying to {message_id}")
-        r = requests.post(f"{self.url}", headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Message sent to {recipient_id}")
+            logger.info(f"Replying to {message_id}")
+            r = requests.post(f"{self.url}", headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Message sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Message not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.info(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Message not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.info(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def send_button(self, button, recipient_id):
         """
@@ -431,22 +466,26 @@ class MaNish(object):
             recipient_id[str]: Phone number of the user with country code wihout +
         check https://github.com/Neurotech-HQ/heyoo#sending-interactive-reply-buttons for an example.
         """
-        button = json.loads(button)
-        data = {
-            "messaging_product": "whatsapp",
-            "to": recipient_id,
-            "type": "interactive",
-            "interactive": self.create_button(button),
-        }
-        logger.info(f"Sending buttons to {recipient_id}")
-        r = requests.post(self.url, headers=self.headers, json=data)
-        if r.status_code == 200:
-            logger.info(f"Buttons sent to {recipient_id}")
+        try:
+            button = json.loads(button)
+            data = {
+                "messaging_product": "whatsapp",
+                "to": recipient_id,
+                "type": "interactive",
+                "interactive": self.create_button(button),
+            }
+            logger.info(f"Sending buttons to {recipient_id}")
+            r = requests.post(self.url, headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Buttons sent to {recipient_id}")
+                return r.json()
+            logger.info(f"Buttons not sent to {recipient_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.info(f"Response: {r.json()}")
             return r.json()
-        logger.info(f"Buttons not sent to {recipient_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.info(f"Response: {r.json()}")
-        return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def delete_media(self, media_id: str):
         """
@@ -454,15 +493,19 @@ class MaNish(object):
         Args:
             media_id[str]: Id of the media to be deleted
         """
-        logger.info(f"Deleting media {media_id}")
-        r = requests.delete(f"{self.base_url}/{media_id}", headers=self.headers)
-        if r.status_code == 200:
-            logger.info(f"Media {media_id} deleted")
-            return r.json()
-        logger.info(f"Error deleting media {media_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.info(f"Response: {r.json()}")
-        return None
+        try:
+            logger.info(f"Deleting media {media_id}")
+            r = requests.delete(f"{self.base_url}/{media_id}", headers=self.headers)
+            if r.status_code == 200:
+                logger.info(f"Media {media_id} deleted")
+                return r.json()
+            logger.info(f"Error deleting media {media_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.info(f"Response: {r.json()}")
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def upload_media(self, media: str):
         """
@@ -529,16 +572,19 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.query_media_url("media_id")
         """
-
-        logger.info(f"Querying media url for {media_id}")
-        r = requests.get(f"{self.base_url}/{media_id}", headers=self.headers)
-        if r.status_code == 200:
-            logger.info(f"Media url queried for {media_id}")
-            return r.json()["url"]
-        logger.info(f"Media url not queried for {media_id}")
-        logger.info(f"Status code: {r.status_code}")
-        logger.info(f"Response: {r.json()}")
-        return None
+        try:
+            logger.info(f"Querying media url for {media_id}")
+            r = requests.get(f"{self.base_url}/{media_id}", headers=self.headers)
+            if r.status_code == 200:
+                logger.info(f"Media url queried for {media_id}")
+                return r.json()["url"]
+            logger.info(f"Media url not queried for {media_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.info(f"Response: {r.json()}")
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def download_media(self, media_url: str, mime_type: str, file_path: str = "temp"):
         """
@@ -556,32 +602,27 @@ class MaNish(object):
             >>> manish.download_media("media_url", "image/jpeg")
             >>> manish.download_media("media_url", "video/mp4", "path/to/file") #do not include the file extension
         """
-        r = requests.get(media_url, headers=self.headers)
-        content = r.content
-        extension = mime_type.split("/")[1]
-        # create a temporary file
         try:
+            r = requests.get(media_url, headers=self.headers)
+            content = r.content
+            extension = mime_type.split("/")[1]
+            # create a temporary file
+            try:
 
-            save_file_here = (
-                f"{file_path}.{extension}" if file_path else f"temp.{extension}"
-            )
-            with open(save_file_here, "wb") as f:
-                f.write(content)
-            logger.info(f"Media downloaded to {save_file_here}")
-            return f.name
+                save_file_here = (
+                    f"{file_path}.{extension}" if file_path else f"temp.{extension}"
+                )
+                with open(save_file_here, "wb") as f:
+                    f.write(content)
+                logger.info(f"Media downloaded to {save_file_here}")
+                return f.name
+            except Exception as e:
+                print(e)
+                logger.info(f"Error downloading media to {save_file_here}")
+                return None
         except Exception as e:
-            print(e)
-            logger.info(f"Error downloading media to {save_file_here}")
-            return None
-
-    def preprocess(self, data):
-        """
-        Preprocesses the data received from the webhook.
-        This method is designed to only be used internally.
-        Args:
-            data[dict]: The data received from the webhook
-        """
-        return data["entry"][0]["changes"][0]["value"]
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def get_name(self, data):
         """
@@ -595,10 +636,14 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> mobile = manish.get_name(data)
         """
-        contact = self.preprocess(data)
-        if contact:
-            return contact["contacts"][0]["profile"]["name"]
-        return None
+        try:
+            contact = self.preprocess(data)
+            if contact:
+                return contact["contacts"][0]["profile"]["name"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_message(self, data):
         """
@@ -612,10 +657,14 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> message = manish.get_message(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            return data["messages"][0]["text"]["body"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                return data["messages"][0]["text"]["body"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_message_id(self, data):
         """
@@ -629,10 +678,14 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> message_id = manish.get_message_id(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            return data["messages"][0]["id"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                return data["messages"][0]["id"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_message_timestamp(self, data):
         """ "
@@ -646,10 +699,14 @@ class MaNish(object):
             >>> manish = Manish(token, phone_number_id)
             >>> manish.get_message_timestamp(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            return data["messages"][0]["timestamp"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                return data["messages"][0]["timestamp"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_interactive_response(self, data):
         """
@@ -666,11 +723,15 @@ class MaNish(object):
             >>> message_id = response[intractive_type]["id"]
             >>> message_text = response[intractive_type]["title"]
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            if "interactive" in data["messages"][0]:
-                return data["messages"][0]["interactive"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                if "interactive" in data["messages"][0]:
+                    return data["messages"][0]["interactive"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
 
     def get_location(self, data):
         """
@@ -684,11 +745,15 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.get_location(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            if "location" in data["messages"][0]:
-                return data["messages"][0]["location"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                if "location" in data["messages"][0]:
+                    return data["messages"][0]["location"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_image(self, data):
         """ "
@@ -702,11 +767,15 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> image_id = manish.get_image(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            if "image" in data["messages"][0]:
-                return data["messages"][0]["image"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                if "image" in data["messages"][0]:
+                    return data["messages"][0]["image"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_audio(self, data):
         """
@@ -720,11 +789,15 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.get_audio(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            if "audio" in data["messages"][0]:
-                return data["messages"][0]["audio"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                if "audio" in data["messages"][0]:
+                    return data["messages"][0]["audio"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_video(self, data):
         """
@@ -738,11 +811,15 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.get_video(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            if "video" in data["messages"][0]:
-                return data["messages"][0]["video"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                if "video" in data["messages"][0]:
+                    return data["messages"][0]["video"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_message_type(self, data):
         """
@@ -756,10 +833,14 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.get_message_type(data)
         """
-        data = self.preprocess(data)
-        if "messages" in data:
-            return data["messages"][0]["type"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "messages" in data:
+                return data["messages"][0]["type"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def get_delivery(self, data):
         """
@@ -769,10 +850,14 @@ class MaNish(object):
         Returns:
             dict: The delivery status of the message and message id of the message
         """
-        data = self.preprocess(data)
-        if "statuses" in data:
-            return data["statuses"][0]["status"]
-        return None
+        try:
+            data = self.preprocess(data)
+            if "statuses" in data:
+                return data["statuses"][0]["status"]
+            return None
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def changed_field(self, data):
         """
@@ -786,8 +871,11 @@ class MaNish(object):
             >>> manish = MaNish(token, phone_number_id)
             >>> manish.changed_field(data)
         """
-        return data["entry"][0]["changes"][0]["field"]
-
+        try:
+            return data["entry"][0]["changes"][0]["field"]
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return None
 
     def create_button(self, button):
         """
