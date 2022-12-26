@@ -225,6 +225,7 @@ class MaNish(object):
         else:
             if os.path.exists(image):
                 id = self.upload_media(image)
+                logger.debug(id)
             else:
                 id = image
             data = {
@@ -355,6 +356,46 @@ class MaNish(object):
         logger.error(r.json())
         return r.json()
 
+
+    def send_template(self, template, recipient_id, lang="en_US", components: str={}):
+        """
+        Sends a template message to a WhatsApp user, Template messages can either be;
+            1. Text template
+            2. Media based template
+            3. Interactive template
+        You can customize the template message by passing a dictionary of components.
+        You can find the available components in the documentation.
+        https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-message-templates
+        Args:
+            template[str]: Template name to be sent to the user
+            recipient_id[str]: Phone number of the user with country code wihout +
+            lang[str]: Language of the template message
+            components[dict]: Dictionary of components to be sent to the user
+        Example:
+            >>> from namish import MaNish
+            >>> namish = MaNish(token, phone_number_id)
+            >>> MaNish.send_template("hello_world", "5511999999999", lang="en_US"))
+        """
+        data = {
+            "messaging_product": "whatsapp",
+            "to": recipient_id,
+            "type": "template",
+            "template": {
+                "name": template,
+                "language": {"code": lang},
+                "components": components,
+            },
+        }
+        logger.info(f"Sending template to {recipient_id}")
+        r = requests.post(self.url, headers=self.headers, json=data)
+        if r.status_code == 200:
+            logger.info(f"Template sent to {recipient_id}")
+            return r.json()
+        logger.info(f"Template not sent to {recipient_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.info(f"Response: {r.json()}")
+        return r.json()
+
     def reply_to_message(self, message_id: str, recipient_id: str, message: str, preview_url: bool = True):
         """
         Replies to a message
@@ -383,7 +424,6 @@ class MaNish(object):
         logger.info(f"Response: {r.json()}")
         return r.json()
 
-
     def send_button(self, button, recipient_id):
         """
         Sends an interactive buttons message to a WhatsApp user
@@ -408,9 +448,6 @@ class MaNish(object):
         logger.info(f"Status code: {r.status_code}")
         logger.info(f"Response: {r.json()}")
         return r.json()
-
-
-
 
     def delete_media(self, media_id: str):
         """
