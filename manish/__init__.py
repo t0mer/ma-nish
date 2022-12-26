@@ -356,7 +356,6 @@ class MaNish(object):
         logger.error(r.json())
         return r.json()
 
-
     def send_template(self, template, recipient_id, lang="en_US", components: str={}):
         """
         Sends a template message to a WhatsApp user, Template messages can either be;
@@ -508,6 +507,287 @@ class MaNish(object):
         except Exception as e:
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
+
+    def preprocess(self, data):
+        """
+        Preprocesses the data received from the webhook.
+        This method is designed to only be used internally.
+        Args:
+            data[dict]: The data received from the webhook
+        """
+        return data["entry"][0]["changes"][0]["value"]
+
+    def query_media_url(self, media_id: str):
+        """
+        Query media url from media id obtained either by manually uploading media or received media
+        Args:
+            media_id[str]: Media id of the media
+        Returns:
+            str: Media url
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.query_media_url("media_id")
+        """
+
+        logger.info(f"Querying media url for {media_id}")
+        r = requests.get(f"{self.base_url}/{media_id}", headers=self.headers)
+        if r.status_code == 200:
+            logger.info(f"Media url queried for {media_id}")
+            return r.json()["url"]
+        logger.info(f"Media url not queried for {media_id}")
+        logger.info(f"Status code: {r.status_code}")
+        logger.info(f"Response: {r.json()}")
+        return None
+
+    def download_media(self, media_url: str, mime_type: str, file_path: str = "temp"):
+        """
+        Download media from media url obtained either by manually uploading media or received media
+        Args:
+            media_url[str]: Media url of the media
+            mime_type[str]: Mime type of the media
+            file_path[str]: Path of the file to be downloaded to. Default is "temp"
+                            Do not include the file extension. It will be added automatically.
+        Returns:
+            str: Media url
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.download_media("media_url", "image/jpeg")
+            >>> manish.download_media("media_url", "video/mp4", "path/to/file") #do not include the file extension
+        """
+        r = requests.get(media_url, headers=self.headers)
+        content = r.content
+        extension = mime_type.split("/")[1]
+        # create a temporary file
+        try:
+
+            save_file_here = (
+                f"{file_path}.{extension}" if file_path else f"temp.{extension}"
+            )
+            with open(save_file_here, "wb") as f:
+                f.write(content)
+            logger.info(f"Media downloaded to {save_file_here}")
+            return f.name
+        except Exception as e:
+            print(e)
+            logger.info(f"Error downloading media to {save_file_here}")
+            return None
+
+    def preprocess(self, data):
+        """
+        Preprocesses the data received from the webhook.
+        This method is designed to only be used internally.
+        Args:
+            data[dict]: The data received from the webhook
+        """
+        return data["entry"][0]["changes"][0]["value"]
+
+    def get_name(self, data):
+        """
+        Extracts the name of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            str: The name of the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> mobile = manish.get_name(data)
+        """
+        contact = self.preprocess(data)
+        if contact:
+            return contact["contacts"][0]["profile"]["name"]
+        return None
+
+    def get_message(self, data):
+        """
+        Extracts the text message of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            str: The text message received from the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> message = manish.get_message(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            return data["messages"][0]["text"]["body"]
+        return None
+
+    def get_message_id(self, data):
+        """
+        Extracts the message id of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            str: The message id of the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> message_id = manish.get_message_id(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            return data["messages"][0]["id"]
+        return None
+
+    def get_message_timestamp(self, data):
+        """ "
+        Extracts the timestamp of the message from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            str: The timestamp of the message
+        Example:
+            >>> from manish import Manish
+            >>> manish = Manish(token, phone_number_id)
+            >>> manish.get_message_timestamp(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            return data["messages"][0]["timestamp"]
+        return None
+
+    def get_interactive_response(self, data):
+        """
+         Extracts the response of the interactive message from the data received from the webhook.
+         Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: The response of the interactive message
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> response = manish.get_interactive_response(data)
+            >>> intractive_type = response.get("type")
+            >>> message_id = response[intractive_type]["id"]
+            >>> message_text = response[intractive_type]["title"]
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "interactive" in data["messages"][0]:
+                return data["messages"][0]["interactive"]
+        return None
+
+    def get_location(self, data):
+        """
+        Extracts the location of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: The location of the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.get_location(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "location" in data["messages"][0]:
+                return data["messages"][0]["location"]
+        return None
+
+    def get_image(self, data):
+        """ "
+        Extracts the image of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: The image_id of an image sent by the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> image_id = manish.get_image(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "image" in data["messages"][0]:
+                return data["messages"][0]["image"]
+        return None
+
+    def get_audio(self, data):
+        """
+        Extracts the audio of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: The audio of the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.get_audio(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "audio" in data["messages"][0]:
+                return data["messages"][0]["audio"]
+        return None
+
+    def get_video(self, data):
+        """
+        Extracts the video of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: Dictionary containing the video details sent by the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.get_video(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "video" in data["messages"][0]:
+                return data["messages"][0]["video"]
+        return None
+
+    def get_message_type(self, data):
+        """
+        Gets the type of the message sent by the sender from the data received from the webhook.
+        Args:
+            data [dict]: The data received from the webhook
+        Returns:
+            str: The type of the message sent by the sender
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.get_message_type(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            return data["messages"][0]["type"]
+        return None
+
+    def get_delivery(self, data):
+        """
+        Extracts the delivery status of the message from the data received from the webhook.
+        Args:
+            data [dict]: The data received from the webhook
+        Returns:
+            dict: The delivery status of the message and message id of the message
+        """
+        data = self.preprocess(data)
+        if "statuses" in data:
+            return data["statuses"][0]["status"]
+        return None
+
+    def changed_field(self, data):
+        """
+        Helper function to check if the field changed in the data received from the webhook.
+        Args:
+            data [dict]: The data received from the webhook
+        Returns:
+            str: The field changed in the data received from the webhook
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.changed_field(data)
+        """
+        return data["entry"][0]["changes"][0]["field"]
+
 
     def create_button(self, button):
         """
