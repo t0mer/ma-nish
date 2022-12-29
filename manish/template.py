@@ -15,11 +15,12 @@ class Currency:
         self.code = code
         self.amount_1000 = amount_1000
 
-class Image:
+class Media:
     id: str
-
-    def __init__(self, id: str) -> None:
+    link: str
+    def __init__(self, id: str="", link: str="") -> None:
         self.id = id
+        self.link = link
 
 class Parameter:
     type: str
@@ -38,15 +39,14 @@ class CurrencyParameter:
         self.currency = currency
 
 
-class ImageParameter:
+class MediaParameter:
     type: str
-    image: Image
+    image: Media
 
-    def __init__(self, type: str, image: Image) -> None:
+    def __init__(self, type: str, image: Media) -> None:
         self.type = type
         self.image = image
-
-
+        
 
 class Component:
     type: str
