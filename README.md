@@ -65,3 +65,19 @@ First you’ll need to follow the (instructions on this page)[https://developers
 * Register as a Meta Developer
 * Enable two-factor authentication for your account
 * Create a Meta App – you need to create a Business App for WhatsApp
+
+Once you’ve done that, go to your app and set up the WhatsApp product.
+
+[![New app](https://techblog.co.il/wp-content/uploads/2022/12/new-app.png "New App")](https://techblog.co.il/wp-content/uploads/2022/12/new-app.png "New App")
+
+You’ll be given a temporary access token and a Phone Number ID, note these down as you’ll need them later. Set up your own phone number as a recipient and you can have a go at sending yourself a test message:
+
+[![Getting started](https://techblog.co.il/wp-content/uploads/2022/12/test-number.png "Getting started")](https://techblog.co.il/wp-content/uploads/2022/12/test-number.png "Getting started")
+
+### Set Up Message Template
+
+In the test message above, you used the **hello_world** template. You’ll need to set up your own template for your own purposes. If you go to [“Message Templates”](https://business.facebook.com/wa/manage/message-templates/) in the WhatsApp manager you can build your own templates.
+
+In the following example, i created a template for my smat home. The template header if fixed and so is the footer. in the body i added variable for dynamic text:
+
+[![Smart Home Template](https://techblog.co.il/wp-content/uploads/2022/12/my-template.png "Smart Home Template")](https://techblog.co.il/wp-content/uploads/2022/12/my-template.png "Smart Home Template")
