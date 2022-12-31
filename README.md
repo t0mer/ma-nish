@@ -135,3 +135,55 @@ You can either specify:
         recipient_id="97250xxxxxxx",
     )
 ```
+
+## Sending Audio
+
+```python
+>>> manish.send_audio(
+        audio="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+        recipient_id="97250xxxxxxx",
+    )
+```
+
+## Sending Document
+
+```python
+>>> messenger.send_document(
+        document="https://www.africau.edu/images/default/sample.pdf",
+        recipient_id="97250xxxxxxx",
+    )
+```
+
+## Sending Sticker
+Cloud API: Static and animated third-party outbound stickers are supported in addition to all types of inbound stickers. A static sticker needs to be 512x512 pixels and cannot exceed 100 KB. An animated sticker must be 512x512 pixels and cannot exceed 500 KB.
+
+When sending from local file, the app will automatically convert the image to the supported format.
+
+
+```python
+>>> manish.send_sticker(
+        image="https://i.imgur.com/COXQuEz.webp",
+        recipient_id="97250xxxxxxx",
+    )
+```
+
+## Sending Location
+The Location message object requires **longitude** and **latitude**, but you can also send real address and manish will translate the address to coordinates and send thr message.
+
+```python
+>>> from manish.location import *
+>>> location = Location(address="10 Hagalil street, raanana",name="Home")
+>>> manish.send_location(location = location,recipient_id="97250xxxxxxx")
+
+```
+
+## Sending Contact(s)
+```python
+>>> from manish.contact import *
+>>> phones = [Phone(phone="97250xxxxxxx",type="CELL")]
+>>> name = Name(formatted_name="Tomer Klein", first_name="Tomer", last_name="Klein")
+>>> addresses = [Address(street="Hagalil 10", city="Raanana", zip ="123456", country="Israel")]
+>>> emails = [Email("jhon.c@gmail.com")]
+>>> contact = Contact(name=name,addresses=addresses,emails=emails,phones=phones)
+>>> data = ContactEncoder().encode([contact])
+>>> manish.send_contacts(data,"97250xxxxxxx")
