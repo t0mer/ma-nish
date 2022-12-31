@@ -187,3 +187,19 @@ The Location message object requires **longitude** and **latitude**, but you can
 >>> contact = Contact(name=name,addresses=addresses,emails=emails,phones=phones)
 >>> data = ContactEncoder().encode([contact])
 >>> manish.send_contacts(data,"97250xxxxxxx")
+
+```
+
+## Sending Button(s)
+```python
+>>> from manish.button import *
+>>> rows = []
+>>> rows.append(Row("row 1","Send Mony",""))
+>>> rows.append(Row("row 2","Withdraw Mony",""))
+>>> sections = []
+>>> sections.append(Section("iBank",rows))
+>>> action = Action("Button Testing",sections)
+>>> button = Button("Header Testing", "Body Testing", "Footer Testing",action)
+>>> data = ButtonEncoder().encode(button)
+>>> manish.send_button(data,"97250xxxxxxx")
+```
