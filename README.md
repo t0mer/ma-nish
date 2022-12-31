@@ -81,3 +81,57 @@ In the test message above, you used the **hello_world** template. You’ll need 
 In the following example, i created a template for my smat home. The template header if fixed and so is the footer. in the body i added variable for dynamic text:
 
 [![Smart Home Template](https://techblog.co.il/wp-content/uploads/2022/12/my-template.png "Smart Home Template")](https://techblog.co.il/wp-content/uploads/2022/12/my-template.png "Smart Home Template")
+
+
+Once you're done with the above ,you're ready to start send messages using **manish**.
+
+## Authentication
+Before you can send messages, you need to authenticate your application using the **```phone_number_id```** and **```Token```** of your test number.
+
+```python
+>>> from manish import MaNish
+>>> manish = MaNish('TOKEN',  phone_number_id='xxxxxxxxxx')
+```
+
+One your app is authenticated, you can start sending messages.
+As mentioned above, it is only possible to send messages other than templates after the target phone responds to an initial message.
+
+## Sending Messanges
+
+This method can be used for sending simple text messages.
+
+```python
+>>> manish.send_message(
+        message='Your message',
+        recipient_id='97250xxxxxxx'
+     )
+```
+***Mobile should include country code without the + symbol***
+
+## Sending Images
+When sending media:
+* Images
+* Video
+* Audio
+* Document
+* Gif
+
+You can either specify:
+* URL for the media.
+* Local file.
+
+```python
+>>> manish.send_image(
+        image="https://i.imgur.com/COXQuEz.jpeg",
+        recipient_id="97250xxxxxxx",
+    )
+```
+
+## Sending Video
+```python
+
+>>> manish.send_video(
+        video="https://user-images.githubusercontent.com/4478920/200173402-8a8343c3-afc2-4341-86ea-c833bed98a9a.mp4",
+        recipient_id="97250xxxxxxx",
+    )
+```
