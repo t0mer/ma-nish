@@ -7,9 +7,13 @@ class Location(object):
     latitude: str
     longitude: str
 
-    def __init__(self, name: str =None, address: str=None, latitude: str="", longitude: str=""):
-        self.latitude = None
-        self.longitude = None
+    def __init__(self, name: str =None, address: str=None, latitude: str=None, longitude: str=None):
+        """
+        Create Location object.
+        If latitude or longitude are None or Empty, i will generate it from address using [GeoPy](https://geopy.readthedocs.io/en/stable/)
+        """
+        self.latitude = latitude
+        self.longitude = longitude
         self.name = name
         self.address = address
 
@@ -21,7 +25,7 @@ class Location(object):
 
 class LocationEncoder(JSONEncoder):
     """
-    Methon to json encode
+    Returns Location object as json
     """
     def default(self, o):
         return o.__dict__

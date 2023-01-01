@@ -20,7 +20,7 @@ class Contact(object):
 
 class ContactEncoder(JSONEncoder):
     """
-    Methon to json encode
+    Return Contact object as json
     """
     def default(self, o):
         return o.__dict__

@@ -46,7 +46,7 @@ class Button:
 
 class ButtonEncoder(JSONEncoder):
     """
-    Methon to json encode
+    Returns Button object as json
     """
     def default(self, o):
         return o.__dict__

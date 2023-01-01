@@ -17,6 +17,9 @@ class Helpers:
 
 
     def download_file(self,url):
+        """
+        Saving remote file to local pash.
+        """
         file = requests.get(url)
         open(self.temp_directory +"/" + os.path.basename(urlparse(url).path), "wb").write(file.content)
         return self.temp_directory +"/" +  os.path.basename(urlparse(url).path)   

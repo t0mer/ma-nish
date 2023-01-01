@@ -64,7 +64,7 @@ class Components:
 
 class TemplateEncoder(JSONEncoder):
     """
-    Methon to json encode
+    Returns Template object as json
     """
     def default(self, o):
         return o.__dict__

@@ -85,7 +85,7 @@ class MaNish(object):
         example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
-            >>> manish.send_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "1122334455667")
+            >>> manish.send_video("https://www.youtube.com/watch?v=ul_9qe_fiTY", "1122334455667")
         """
         try:
             if validators.url(video):
@@ -176,7 +176,7 @@ class MaNish(object):
         Example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
-            >>> manish.send_audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", "1122334455667")
+            >>> manish.send_audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", "1122334455667")
         """
         try:
             if validators.url(audio):
@@ -224,7 +224,7 @@ class MaNish(object):
         Example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
-            >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
+            >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "1122334455667")
         """
         try:
             if validators.url(image):
@@ -275,7 +275,7 @@ class MaNish(object):
         Example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
-            >>> manish.send_image("https://i.imgur.com/Fh7XVYY.jpeg", "5511999999999")
+            >>> manish.send_image("https://i.imgur.com/COXQuEz.jpeg", "1122334455667")
         """
         try:
             if validators.url(sticker):
@@ -348,15 +348,12 @@ class MaNish(object):
         """
         Sends a location message to a WhatsApp user
         Args:
-            lat[str]: Latitude of the location
-            long[str]: Longitude of the location
-            name[str]: Name of the location
-            address[str]: Address of the location
+            location: Location object (If no coordinates provided, it will be generated using geopy)
             recipient_id[str]: Phone number of the user with country code wihout +
         Example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
-            >>> manish.send_location("-23.564", "-46.654", "My Location", "Rua dois, 123", "5511999999999")
+            >>> manish.send_location(Location, "1122334455667")
         """
         try:
             data = {
@@ -388,8 +385,7 @@ class MaNish(object):
         Sends a template message to a WhatsApp user, Template messages can either be;
             1. Text template
             2. Media based template
-            3. Interactive template
-        You can customize the template message by passing a dictionary of components.
+        You can customize the template message by using the Component object and pass it as json.
         You can find the available components in the documentation.
         https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-message-templates
         Args:
@@ -400,7 +396,7 @@ class MaNish(object):
         Example:
             >>> from namish import MaNish
             >>> namish = MaNish(token, phone_number_id)
-            >>> MaNish.send_template("hello_world", "5511999999999", lang="en_US"))
+            >>> MaNish.send_template("hello_world", "1122334455667", lang="en_US"))
         """
         try:
             data = {
@@ -462,7 +458,7 @@ class MaNish(object):
         """
         Sends an interactive buttons message to a WhatsApp user
         Args:
-            button[dict]: A dictionary containing the button data(rows-title may not exceed 20 characters)
+            button[dict]: Generate button using Button object and pass it as srting
             recipient_id[str]: Phone number of the user with country code wihout +
         check https://github.com/Neurotech-HQ/heyoo#sending-interactive-reply-buttons for an example.
         """
@@ -562,7 +558,7 @@ class MaNish(object):
 
     def query_media_url(self, media_id: str):
         """
-        Query media url from media id obtained either by manually uploading media or received media
+        Query media url from media id obtained either by media Id
         Args:
             media_id[str]: Media id of the media
         Returns:
