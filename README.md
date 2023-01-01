@@ -108,7 +108,7 @@ This method can be used for sending simple text messages.
 ```
 ***Mobile should include country code without the + symbol***
 
-## Sending Images
+## Sending Media
 When sending media:
 * Images
 * Video
@@ -119,6 +119,8 @@ When sending media:
 You can either specify:
 * URL for the media.
 * Local file.
+
+## Sending Image
 
 ```python
 >>> manish.send_image(
@@ -202,4 +204,35 @@ The Location message object requires **longitude** and **latitude**, but you can
 >>> button = Button("Header Testing", "Body Testing", "Footer Testing",action)
 >>> data = ButtonEncoder().encode(button)
 >>> manish.send_button(data,"97250xxxxxxx")
+```
+
+## Sending Template Messages
+This method allows you to send template based messages (and bypass the limitation of the ability to send message outside the 24 hours window).
+
+Template messages can either be:
+* Text Template (Can also include currency object)
+* Media Template (Same as Text but with media in the header)
+
+### Sending simple text template
+```python
+>>> from manish.template import *
+>>> def send_template():
+>>> parameter = Parameter(type="text",text = "Your Text Message")
+>>> parameters = []
+>>> parameters.append(parameter)
+>>> body = Component(type="body",parameters=[parameter])
+>>> manish.send_template(components=TemplateEncoder().encode([body]),recipient_id="97250xxxxxxx",template="smart_home_media",lang="he")
+```
+
+### Sending media template
+**Media can only be attached to the header!**
+```python
+>>> parameter = Parameter(type="text",text = "Your Text Message")
+>>> img = Media(link="https://raw.githubusercontent.com/t0mer/broadlinkmanager-docker/master/screenshots/Devices%20List.png")
+>>> iparam = MediaParameter(type="image",image=img)
+>>> parameters = []
+>>> parameters.append(parameter)
+>>> body = Component(type="body",parameters=[parameter])
+>>> header = Component(type="header",parameters=[iparam])
+>>> manish.send_template(components=TemplateEncoder().encode([body,header]),recipient_id="97250xxxxxxx",template="smart_home_media",lang="he")
 ```
