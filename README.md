@@ -40,8 +40,8 @@ Use git to clone or you can also manually download the project repository just a
 
 ```bash
 $ git clone https://github.com/t0mer/ma-nish/
-$ cd heyoo
-heyoo $ python setup.py install 
+$ cd ma-nish
+ma-nish $ python setup.py install 
 ```
 
 ### Installing from PyPi
@@ -49,11 +49,11 @@ heyoo $ python setup.py install
 ```bash
 # For Windows 
 
-pip install  --upgrade manish
+pip install  --upgrade ma-nish
 
 #For Linux | MAC 
 
-pip3 install --upgrade manish
+pip3 install --upgrade ma-nish
 ```
 
 
