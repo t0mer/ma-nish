@@ -12,7 +12,7 @@ MaNish is an Unofficial python wrapper to [WhatsApp Cloud API](https://developer
 6. Sending Template messages
 7. Parsing messages and media received (Webhook)
 
-## Components and Frameworks used in Voicy
+## Components and Frameworks used in manish
 * [Loguru](https://pypi.org/project/loguru/)
 * [Requests ](https://pypi.org/project/requests/)
 * [requests-toolbelt](https://pypi.org/project/requests-toolbelt/)
