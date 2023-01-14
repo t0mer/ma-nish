@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="UTF-8") as f:
 
 
 setup_args = dict(
-    name='manish',
+    name='ma-nish',
     version='0.5.0',
     description='manish is an unofficial python wrapper for Whatsapp cloud api',
     long_description_content_type="text/markdown",
