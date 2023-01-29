@@ -60,7 +60,7 @@ pip3 install --upgrade ma-nish
 ## Setting up the environment
 ### Set Up Meta App
 
-First you’ll need to follow the (instructions on this page)[https://developers.facebook.com/docs/whatsapp/cloud-api/get-started] to:
+First you’ll need to follow the [instructions on this page](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started) to:
 
 * Register as a Meta Developer
 * Enable two-factor authentication for your account
