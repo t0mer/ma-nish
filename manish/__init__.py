@@ -795,6 +795,24 @@ class MaNish(object):
             logger.error("aw snap something went wrong: " + str(e))
             return None
 
+
+    def get_mobile(self, data: Dict[Any, Any]) -> Union[str, None]:
+        """
+        Extracts the mobile number of the sender from the data received from the webhook.
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            str: The mobile number of the sender
+        Example:
+            >>> from whatsapp import WhatsApp
+            >>> manish = MaNish(token, phone_number_id)
+            >>> mobile = manish.get_mobile(data)
+        """
+        data = self.preprocess(data)
+        if "contacts" in data:
+            return data["contacts"][0]["wa_id"]
+
+
     def get_video(self, data):
         """
         Extracts the video of the sender from the data received from the webhook.
