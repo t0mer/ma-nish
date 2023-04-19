@@ -37,6 +37,35 @@ class MaNish(object):
         except Exception as e:
             logger.error("Error initializing MaNish: " + str(e))
 
+
+    def set_status(self, message_id):
+        """
+        Change the status of a message.
+        Args:
+            message_id[str]: The id of the message
+        Example:
+            ```python
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.set_status(message_id)
+
+        """
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "status": "read",
+                "message_id": message_id
+            }
+            r = requests.post(f"{self.url}", headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Message ID {message_id} marked as read")
+                return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
+
+
+
     def send_message(self, message, recipient_id, recipient_type="individual", preview_url=True):
         """
          Sends a text message to a WhatsApp user
@@ -668,7 +697,7 @@ class MaNish(object):
         Args:
             data[dict]: The data received from the webhook
         Returns:
-            str: The message id of the sender
+            str: The message id of the message
         Example:
             >>> from manish import MaNish
             >>> manish = MaNish(token, phone_number_id)
