@@ -611,7 +611,7 @@ class MaNish(object):
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
 
-    def download_media(self, media_url: str, mime_type: str, file_path: str = "temp"):
+    def download_media(self, media_url: str, mime_type: str, file_path: str = ""):
         """
         Download media from media url obtained either by manually uploading media or received media
         Args:
@@ -631,9 +631,14 @@ class MaNish(object):
             r = requests.get(media_url, headers=self.headers)
             content = r.content
             extension = mime_type.split("/")[1]
+            if ";" in extension:
+                extension = extension.split(";")[0]
             # create a temporary file
             try:
-
+                if file_path == "":
+                    save_file_here = f"/tmp/temp.{extension}"
+                else:
+                    save_file_here = f"{file_path}/temp.{extension}"
                 save_file_here = (
                     f"{file_path}.{extension}" if file_path else f"temp.{extension}"
                 )
@@ -648,6 +653,7 @@ class MaNish(object):
         except Exception as e:
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
+
 
     def get_name(self, data):
         """
