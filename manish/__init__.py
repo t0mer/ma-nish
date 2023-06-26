@@ -64,8 +64,6 @@ class MaNish(object):
             logger.error("aw snap something went wrong: " + str(e))
             return '{"error":"' + str(e)  + '"}'
 
-
-
     def send_message(self, message, recipient_id, recipient_type="individual", preview_url=True):
         """
          Sends a text message to a WhatsApp user
@@ -336,6 +334,47 @@ class MaNish(object):
             logger.info(f"Image not sent to {recipient_id}")
             logger.info(f"Status code: {r.status_code}")
             logger.error(r.json())
+            return r.json()
+        except Exception as e:
+            logger.error("aw snap something went wrong: " + str(e))
+            return '{"error":"' + str(e)  + '"}'
+
+
+    def send_reaction(
+        self, emoji, message_id, recipient_id, recipient_type="individual"
+    ):
+        """
+         Sends a reaction message to a WhatsApp user's message
+
+         Args:
+                emoji[str]: Emoji to become a reaction to a message. Ex.: '\uD83D\uDE00' (😀)
+                message_id[str]: Message id for a reaction to be attached to
+                recipient_id[str]: Phone number of the user with country code without +
+                recipient_type[str]: Type of the recipient, either individual or group
+
+        Example:
+            ```python
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> manish.send_reaction("\uD83D\uDE00", "wamid.HBgLM...", "5511999999999")
+
+        """
+        try:
+            data = {
+                "messaging_product": "whatsapp",
+                "recipient_type": recipient_type,
+                "to": recipient_id,
+                "type": "reaction",
+                "reaction": {"message_id": message_id, "emoji": emoji},
+            }
+            logger.info(f"Sending reaction to number {recipient_id} message id {message_id}")
+            r = requests.post(f"{self.url}", headers=self.headers, json=data)
+            if r.status_code == 200:
+                logger.info(f"Reaction sent to number {recipient_id} message id {message_id}")
+                return r.json()
+            logger.info(f"Message not sent  to number {recipient_id} message id {message_id}")
+            logger.info(f"Status code: {r.status_code}")
+            logger.error(f"Response: {r.json()}")
             return r.json()
         except Exception as e:
             logger.error("aw snap something went wrong: " + str(e))
