@@ -831,6 +831,26 @@ class MaNish(object):
             return None
 
 
+    def get_document(self, data: Dict[Any, Any]) -> Union[Dict, None]:
+        """ "
+        Extracts the document of the sender from the data received from the webhook.
+
+        Args:
+            data[dict]: The data received from the webhook
+        Returns:
+            dict: The document_id of an image sent by the sender
+
+        Example:
+            >>> from manish import MaNish
+            >>> manish = MaNish(token, phone_number_id)
+            >>> document_id = manish.get_document(data)
+        """
+        data = self.preprocess(data)
+        if "messages" in data:
+            if "document" in data["messages"][0]:
+                return data["messages"][0]["document"]
+
+
     def get_mobile(self, data: Dict[Any, Any]) -> Union[str, None]:
         """
         Extracts the mobile number of the sender from the data received from the webhook.
