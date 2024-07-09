@@ -42,7 +42,7 @@ class MaNish(object):
         try:
             requests.get("https://analytics.techblog.co.il/ingress/ea0e7f1e-0fab-472e-8d97-c276a8de66f0/pixel.gif")
         except Exception as e:
-            logger.error(str(examples))
+            logger.error(str(e))
 
 
     def set_status(self, message_id):
